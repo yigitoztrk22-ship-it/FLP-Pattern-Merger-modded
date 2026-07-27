@@ -1,8 +1,35 @@
-# FLP Note Merger for Windows
+# FLP Note Merger
 
-A Python GUI that creates a new FL Studio `.flp` where **all arranged Pattern Clip notes are flattened into one pattern**. It does not render or merge audio.
+Creates a new FL Studio `.flp` where **all arranged Pattern Clip notes are flattened into one pattern**. It does not render or merge audio.
 
-The program is designed for very large projects. Version 1.2 uses NumPy's compiled native vector loops to transform large note batches and writes them directly, avoiding one Python operation per note and avoiding the old external-sort bottleneck. A bounded-memory scalar/sorted fallback remains available.
+Two implementations ship here, and they produce byte-identical output:
+
+- **`rust/` — the fast engine (recommended).** A Rust CLI. Merges a 1.4 million note project in **10 ms**, 14–84x faster end to end than the Python build. See [`rust/README.md`](rust/README.md).
+- **`flp_note_merger.py` — the reference implementation.** Python + NumPy, and the only one with the Windows GUI.
+
+```bash
+cd rust && cargo build --release
+./target/release/flp-note-merger song.flp song_merged_notes.flp
+```
+
+The Rust CLI accepts the same flags as the Python CLI (`--skip-muted`, `--sorted`, `--run-records`), so existing scripts keep working. `tools/compare_impls.py` proves the two agree byte for byte across every fixture profile in both turbo and `--sorted` modes.
+
+The program is designed for very large projects. Version 1.2 of the Python build uses NumPy's compiled native vector loops to transform large note batches and writes them directly, avoiding one Python operation per note and avoiding the old external-sort bottleneck. A bounded-memory scalar/sorted fallback remains available.
+
+## Rust engine performance
+
+Best of 7 runs on a 4-core Linux container, synthetic projects from `tools/make_test_flp.py`. **merge** is the transformation itself — scan, clip index, note expansion and rewrite plan — separated from pushing the output file to disk.
+
+| project | source | merged notes | output | merge | total (fsync) | total (page cache) | Python 1.2 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `small` | 0.02 MB | 3,602 | 0.1 MB | **0.04 ms** | 1.5 ms | 0.1 ms | 126 ms |
+| `medium` | 1.5 MB | 102,972 | 3.5 MB | **0.61 ms** | 7.7 ms | 1.3 ms | 254 ms |
+| `large` | 12.4 MB | 581,264 | 22.3 MB | **2.34 ms** | 36.9 ms | 8.3 ms | 895 ms |
+| `huge` | 47.0 MB | 1,400,272 | 67.2 MB | **10.17 ms** | 150.1 ms | 36.1 ms | 2123 ms |
+
+The merge stays under 20 ms even at 1.4 million merged notes. End-to-end time past roughly 20 MB of output is dominated by writing and flushing the file, which is storage-bound rather than CPU-bound — run with `--verbose` to see the split, or `--no-fsync` to skip the flush.
+
+Reproduce with `python3 tools/benchmark.py`.
 
 ## What it does
 
@@ -127,4 +154,19 @@ Larger values can be faster but use more RAM.
 - Input and output must be different paths.
 - The source is opened read-only.
 - Output is first written as `name.flp.partial` and atomically renamed only after a successful complete write.
-- Temporary sort files are deleted after success, error, or cancellation.
+- Temporary sort files are deleted after success, error, or cancellation. The Rust engine needs no temporary files at all.
+
+## Development and verification
+
+`tools/` holds the scripts that keep the two implementations honest:
+
+```bash
+python3 tools/make_test_flp.py out/           # synthetic .flp fixtures
+python3 tools/compare_impls.py                # Rust vs Python, byte for byte
+python3 tools/benchmark.py                    # the performance table above
+cd rust && cargo test --release               # 24 behavioural tests
+```
+
+`make_test_flp.py` generates projects that exercise the awkward parts of the format: cropped left edges, tails past a clip's right edge, stretched clips in both directions, zero-length step notes, muted clips, audio/automation clips, patterns split across several note events, old 32-byte and new 60-byte Playlist records, 24 to 960 PPQ timebases, opaque plugin blobs, and trailing bytes after `FLdt`.
+
+`compare_impls.py` runs both mergers over every fixture in both turbo and `--sorted` modes and compares the resulting projects byte for byte. Any behavioural difference between the two implementations fails the run.

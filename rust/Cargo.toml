@@ -1,0 +1,29 @@
+[package]
+name = "flp-note-merger"
+version = "2.0.0"
+edition = "2021"
+rust-version = "1.82"
+description = "Flatten every arranged FL Studio Pattern Clip into one merged pattern"
+license = "MIT"
+
+[[bin]]
+name = "flp-note-merger"
+path = "src/main.rs"
+
+[lib]
+name = "flp_note_merger"
+path = "src/lib.rs"
+
+[dependencies]
+memmap2 = "0.9"
+rayon = "1"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.bench]
+inherits = "release"
