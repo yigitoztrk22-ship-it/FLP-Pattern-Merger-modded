@@ -15,6 +15,8 @@ pub const EV_PATTERN_NOTES: u8 = 224;
 pub const EV_PLAYLIST: u8 = 233;
 
 pub const NOTE_SIZE: usize = 24;
+pub const NOTE_KEY: usize = 12;
+pub const NOTE_VELOCITY: usize = 21;
 pub const PLAYLIST_OLD_SIZE: usize = 32;
 pub const PLAYLIST_NEW_SIZE: usize = 60;
 pub const UINT32_MAX: u64 = 0xFFFF_FFFF;

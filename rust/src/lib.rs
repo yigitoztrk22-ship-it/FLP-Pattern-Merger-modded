@@ -18,6 +18,7 @@ pub mod scan;
 pub mod sort;
 
 use std::fs::File;
+use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
@@ -241,6 +242,99 @@ pub fn merge_flp(
         version_text: scan.version_text.clone(),
         timings,
     })
+}
+
+/// Export arranged notes directly as a format-0 Standard MIDI file.
+///
+/// This shares the memory-mapped scan and parallel expansion pipeline with the
+/// FLP merger, avoiding the Python per-note decoding and sorting overhead.
+pub fn export_midi(
+    source_path: &Path,
+    output_path: &Path,
+    options: &MergeOptions,
+    status: Option<StatusCallback<'_>>,
+) -> Result<u64> {
+    let report = |message: &str| {
+        if let Some(status) = status {
+            status(message);
+        }
+    };
+    let source_path = absolutize(source_path);
+    let output_path = absolutize(output_path);
+    if source_path == output_path {
+        return Err(MergeError::usage("Choose a different output path; the source is never overwritten."));
+    }
+    if !source_path.is_file() {
+        return Err(MergeError::usage(format!("Input project not found: {}", source_path.display())));
+    }
+    if let Some(parent) = output_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+
+    let file = File::open(&source_path)?;
+    let mapping = unsafe { memmap2::Mmap::map(&file)? };
+    let mut timings = StageTimings::default();
+    let prepared = prepare(&mapping, options, &mut timings, Some(&report))?;
+    report("Sorting MIDI events…");
+
+    let mut events: Vec<(u64, u8, u8, u8)> = Vec::with_capacity(prepared.merged.count * 2);
+    for record in prepared.merged.bytes.chunks_exact(NOTE_SIZE) {
+        let position = read_u32(record, NOTE_POSITION) as u64;
+        let length = read_u32(record, NOTE_LENGTH).max(1) as u64;
+        let pitch = read_u16(record, NOTE_KEY).min(127) as u8;
+        let velocity = record[NOTE_VELOCITY].clamp(1, 127);
+        events.push((position, 1, pitch, velocity));
+        events.push((position + length, 0, pitch, 0));
+    }
+    events.sort_unstable_by_key(|event| (event.0, event.1));
+
+    let partial = output_path.with_extension("mid.partial");
+    let result = (|| -> Result<()> {
+        let file = File::create(&partial)?;
+        let mut output = BufWriter::with_capacity(1 << 20, file);
+        output.write_all(b"MThd")?;
+        output.write_all(&6u32.to_be_bytes())?;
+        output.write_all(&0u16.to_be_bytes())?;
+        output.write_all(&1u16.to_be_bytes())?;
+        output.write_all(&prepared.scan.ppq.to_be_bytes())?;
+
+        let mut track = Vec::with_capacity(events.len() * 4 + 11);
+        track.extend_from_slice(b"\0\xFF\x51\x03\x07\xA1\x20");
+        let mut previous = 0u64;
+        for (tick, kind, pitch, velocity) in events {
+            push_midi_varlen(&mut track, tick - previous);
+            track.extend_from_slice(&[if kind == 1 { 0x90 } else { 0x80 }, pitch, velocity]);
+            previous = tick;
+        }
+        track.extend_from_slice(b"\0\xFF\x2F\0");
+        output.write_all(b"MTrk")?;
+        output.write_all(&(track.len() as u32).to_be_bytes())?;
+        output.write_all(&track)?;
+        output.flush()?;
+        drop(output);
+        std::fs::rename(&partial, &output_path)?;
+        Ok(())
+    })();
+    if result.is_err() {
+        let _ = std::fs::remove_file(&partial);
+    }
+    result?;
+    report(&format!("Done: {} notes exported to {}.", prepared.merged.count, output_path.display()));
+    Ok(prepared.merged.count as u64)
+}
+
+fn push_midi_varlen(output: &mut Vec<u8>, mut value: u64) {
+    let mut buffer = [0u8; 10];
+    let mut index = buffer.len() - 1;
+    buffer[index] = (value & 0x7F) as u8;
+    while {
+        value >>= 7;
+        value != 0
+    } {
+        index -= 1;
+        buffer[index] = ((value & 0x7F) as u8) | 0x80;
+    }
+    output.extend_from_slice(&buffer[index..]);
 }
 
 /// Write to `name.flp.partial`, then rename only after a complete write.

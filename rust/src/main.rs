@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use flp_note_merger::error::MergeError;
-use flp_note_merger::{merge_flp, MergeOptions, MergeStats, APP_NAME, APP_VERSION};
+use flp_note_merger::{export_midi, merge_flp, MergeOptions, MergeStats, APP_NAME, APP_VERSION};
 
 const USAGE: &str = "\
 Merge all arranged FL Studio Pattern Clip notes into one optimized, notes-only
@@ -19,6 +19,7 @@ OPTIONS:
     --run-records <N>   Accepted for command-line compatibility; unused (no external sort).
     --threads <N>       Worker threads (default: all cores, 1 disables parallelism).
     --no-fsync          Skip the flush-to-disk before the atomic rename.
+    --midi              Export arranged notes as a Standard MIDI file.
     --repeat <N>        Run the merge N times and report the best/median timing.
     -q, --quiet         Only print the final summary line.
     -v, --verbose       Print a per-stage timing breakdown.
@@ -36,6 +37,7 @@ struct Args {
     quiet: bool,
     verbose: bool,
     json: bool,
+    midi: bool,
 }
 
 enum Parsed {
@@ -48,7 +50,7 @@ fn parse_args() -> Result<Parsed, String> {
     let mut options = MergeOptions::default();
     let mut threads = 0usize;
     let mut repeat = 1usize;
-    let (mut quiet, mut verbose, mut json) = (false, false, false);
+    let (mut quiet, mut verbose, mut json, mut midi) = (false, false, false, false);
 
     let mut argv = std::env::args().skip(1);
     while let Some(arg) = argv.next() {
@@ -71,6 +73,7 @@ fn parse_args() -> Result<Parsed, String> {
             "-q" | "--quiet" => quiet = true,
             "-v" | "--verbose" => verbose = true,
             "--json" => json = true,
+            "--midi" => midi = true,
             "--run-records" => {
                 let _ = value("--run-records")?;
             }
@@ -108,6 +111,7 @@ fn parse_args() -> Result<Parsed, String> {
         quiet,
         verbose,
         json,
+        midi,
     })))
 }
 
@@ -212,6 +216,25 @@ fn main() -> ExitCode {
 
     let mut best: Option<MergeStats> = None;
     let mut merge_times: Vec<u128> = Vec::with_capacity(args.repeat);
+    if args.midi {
+        match export_midi(
+            &args.input,
+            &args.output,
+            &args.options,
+            if chatty { Some(&status as flp_note_merger::StatusCallback<'_>) } else { None },
+        ) {
+            Ok(count) => {
+                if !args.quiet && !args.json {
+                    println!("Success: {count:,} notes exported to {}", args.output.display());
+                }
+                return ExitCode::SUCCESS;
+            }
+            Err(err) => {
+                eprintln!("ERROR: {err}");
+                return ExitCode::FAILURE;
+            }
+        }
+    }
     for round in 0..args.repeat {
         let listener = if chatty && round == 0 {
             Some(&status as flp_note_merger::StatusCallback<'_>)

@@ -34,6 +34,57 @@ from typing import BinaryIO, Callable, Optional
 APP_NAME = "FLP Note Merger"
 APP_VERSION = "1.2.0"
 
+LANGUAGES = {
+    "English": "en",
+    "Türkçe": "tr",
+    "日本語": "ja",
+    "Русский": "ru",
+}
+
+TRANSLATIONS = {
+    "en": {
+        "ready": "Ready", "language": "Language", "subtitle": "Flatten every Playlist Pattern Clip into one lossless FL pattern. Audio and automation clips are excluded.", "split_midi": "Split MIDI by Arrangement", "split_info": "When MIDI export is enabled, create one MIDI file for each Arrangement.",
+        "files": "Project files", "input": "Input .flp:", "output": "Output copy:", "browse": "Browse…", "behavior": "Merge behavior",
+        "turbo": "Turbo expansion (native vector batches; recommended)", "turbo_info": "Uses NumPy's compiled native loops and bypasses the unnecessary global note sort. Turn this off only for strict sorted-record compatibility.",
+        "muted": "Include muted Pattern Clips (keeps every note)", "muted_info": "Muted clip state cannot exist after everything is merged into one clip. Included muted notes will therefore become unmuted. Turn this off to preserve the audible song instead.",
+        "arrangements": "All Arrangements are preserved as separate offset sections of one target pattern. Old note payloads and Pattern event automation are cleared to reduce loading and file size.",
+        "midi_mode": "Export MIDI instead of a merged FLP copy", "merge": "Merge notes", "export": "Export MIDI", "cancel": "Cancel", "activity": "Activity",
+        "warning": "Unofficial FLP editing tool — the original file is never changed. Verify the output in FL Studio.", "choose_project": "Choose FL Studio project", "save_midi": "Save MIDI file", "save_flp": "Save merged FLP copy", "midi_file": "MIDI file", "flp_file": "FL Studio project", "all_files": "All files",
+        "choose_input": "Choose an input FLP.", "choose_output": "Choose an output path.", "different": "Input and output must be different files.", "replace": "The output already exists:\n\n{path}\n\nReplace it?", "starting": "Starting…", "mode_midi": "Mode: MIDI export", "mode_flp": "Mode: merged FLP copy", "muted_included": "included", "muted_skipped": "skipped", "engine": "Expansion engine: ", "turbo_engine": "Turbo native/direct", "sorted_engine": "Compatibility sorted", "cancel_requested": "Cancellation requested…", "cancelling": "Cancelling after the current block…", "completed": "Completed successfully.", "midi_completed": "MIDI export completed successfully.", "cancelled": "Cancelled.", "failed": "Failed.", "open_verify": "Open and verify the copy in FL Studio.", "midi_summary": "Exported {count:,} notes to MIDI.\nOutput: {output}", "flp_summary": "Merged {count:,} notes from {clips:,} Pattern Clips.\nTarget pattern: {pattern}\nOutput: {size}\nTime: {time:,.1f} seconds",
+    },
+    "tr": {
+        "ready": "Hazır", "language": "Dil", "subtitle": "Tüm Playlist Pattern Clip'lerini kayıpsız tek bir FL pattern'ında birleştirir. Ses ve otomasyon klipleri hariç tutulur.", "split_midi": "MIDI'yi Düzenlemeye Göre Böl", "split_info": "MIDI dışa aktarımı açıkken her Düzenleme için bir MIDI dosyası oluşturur.", "files": "Proje dosyaları", "input": "Girdi .flp:", "output": "Çıktı:", "browse": "Gözat…", "behavior": "Birleştirme seçenekleri", "turbo": "Turbo genişletme (yerel vektör paketleri; önerilir)", "turbo_info": "NumPy'nin derlenmiş döngülerini kullanır ve gereksiz global nota sıralamasını atlar.", "muted": "Sessiz Pattern Clip'lerini dahil et", "muted_info": "Birleştirilmiş tek klipte sessizlik durumu korunamaz.", "arrangements": "Tüm düzenlemeler hedef pattern içinde ayrı bölümler olarak korunur.", "midi_mode": "Birleştirilmiş FLP yerine MIDI dışa aktar", "merge": "Notaları birleştir", "export": "MIDI dışa aktar", "cancel": "İptal", "activity": "Etkinlik", "warning": "Resmi olmayan FLP düzenleme aracı — orijinal dosya değiştirilmez.", "choose_project": "FL Studio projesi seç", "save_midi": "MIDI dosyasını kaydet", "save_flp": "Birleştirilmiş FLP kopyasını kaydet", "midi_file": "MIDI dosyası", "flp_file": "FL Studio projesi", "all_files": "Tüm dosyalar", "choose_input": "Bir FLP girdisi seçin.", "choose_output": "Bir çıktı yolu seçin.", "different": "Girdi ve çıktı farklı dosyalar olmalıdır.", "replace": "Çıktı zaten var:\n\n{path}\n\nDeğiştirilsin mi?", "starting": "Başlatılıyor…", "mode_midi": "Mod: MIDI dışa aktarma", "mode_flp": "Mod: birleştirilmiş FLP", "muted_included": "dahil", "muted_skipped": "atlanıyor", "engine": "Genişletme motoru: ", "turbo_engine": "Turbo yerel/doğrudan", "sorted_engine": "Uyumluluk sıralı", "cancel_requested": "İptal istendi…", "cancelling": "Mevcut bloktan sonra iptal ediliyor…", "completed": "Başarıyla tamamlandı.", "midi_completed": "MIDI dışa aktarma başarıyla tamamlandı.", "cancelled": "İptal edildi.", "failed": "Başarısız.", "open_verify": "Kopyayı FL Studio'da açıp doğrulayın.", "midi_summary": "{count:,} nota MIDI'ye aktarıldı.\nÇıktı: {output}", "flp_summary": "{clips:,} Pattern Clip'ten {count:,} nota birleştirildi.\nHedef pattern: {pattern}\nÇıktı: {size}\nSüre: {time:,.1f} saniye",
+    },
+    "ja": {
+        "ready": "準備完了", "language": "言語", "subtitle": "すべてのプレイリストのパターンクリップを、1つのFLパターンに統合します。オーディオとオートメーションは除外されます。", "split_midi": "アレンジメントごとにMIDIを分割", "split_info": "MIDI書き出し時に、アレンジメントごとに1つのMIDIファイルを作成します。", "files": "プロジェクトファイル", "input": "入力 .flp:", "output": "出力:", "browse": "参照…", "behavior": "統合設定", "turbo": "ターボ展開（ネイティブベクトル処理・推奨）", "turbo_info": "NumPyのネイティブループを使用し、不要な全体ソートを省略します。", "muted": "ミュートされたパターンクリップを含める", "muted_info": "統合後はミュート状態を保持できません。", "arrangements": "すべてのアレンジメントは、対象パターン内の個別セクションとして保持されます。", "midi_mode": "統合FLPの代わりにMIDIを書き出す", "merge": "ノートを統合", "export": "MIDIを書き出す", "cancel": "キャンセル", "activity": "アクティビティ", "warning": "非公式のFLP編集ツール — 元のファイルは変更されません。", "choose_project": "FL Studioプロジェクトを選択", "save_midi": "MIDIファイルを保存", "save_flp": "統合FLPコピーを保存", "midi_file": "MIDIファイル", "flp_file": "FL Studioプロジェクト", "all_files": "すべてのファイル", "choose_input": "入力FLPを選択してください。", "choose_output": "出力先を選択してください。", "different": "入力と出力は別のファイルにしてください。", "replace": "出力ファイルは既に存在します:\n\n{path}\n\n置き換えますか？", "starting": "開始中…", "mode_midi": "モード: MIDI書き出し", "mode_flp": "モード: 統合FLP", "muted_included": "含める", "muted_skipped": "除外", "engine": "展開エンジン: ", "turbo_engine": "ターボ ネイティブ/直接", "sorted_engine": "互換ソート", "cancel_requested": "キャンセルを要求しました…", "cancelling": "現在のブロック後にキャンセルします…", "completed": "正常に完了しました。", "midi_completed": "MIDIの書き出しが完了しました。", "cancelled": "キャンセルしました。", "failed": "失敗しました。", "open_verify": "コピーをFL Studioで開いて確認してください。", "midi_summary": "{count:,}個のノートをMIDIに書き出しました。\n出力: {output}", "flp_summary": "{clips:,}個のPattern Clipから{count:,}個のノートを統合しました。\n対象パターン: {pattern}\n出力: {size}\n時間: {time:,.1f}秒",
+    },
+    "ru": {
+        "ready": "Готово", "language": "Язык", "subtitle": "Объединяет все клипы паттернов Playlist в один FL-паттерн без потерь. Аудио и автоматизация исключаются.", "split_midi": "Разделять MIDI по аранжировкам", "split_info": "При экспорте MIDI создавать отдельный файл для каждой аранжировки.", "files": "Файлы проекта", "input": "Входной .flp:", "output": "Выход:", "browse": "Обзор…", "behavior": "Параметры объединения", "turbo": "Турбо-обработка (нативные векторные пакеты; рекомендуется)", "turbo_info": "Использует скомпилированные циклы NumPy и пропускает ненужную глобальную сортировку нот.", "muted": "Включать заглушенные клипы паттернов", "muted_info": "После объединения состояние заглушения сохранить нельзя.", "arrangements": "Все аранжировки сохраняются отдельными секциями внутри целевого паттерна.", "midi_mode": "Экспортировать MIDI вместо объединенного FLP", "merge": "Объединить ноты", "export": "Экспорт MIDI", "cancel": "Отмена", "activity": "Активность", "warning": "Неофициальный редактор FLP — исходный файл не изменяется.", "choose_project": "Выберите проект FL Studio", "save_midi": "Сохранить MIDI-файл", "save_flp": "Сохранить объединенную копию FLP", "midi_file": "MIDI-файл", "flp_file": "Проект FL Studio", "all_files": "Все файлы", "choose_input": "Выберите входной FLP.", "choose_output": "Выберите путь вывода.", "different": "Входной и выходной файлы должны отличаться.", "replace": "Выходной файл уже существует:\n\n{path}\n\nЗаменить его?", "starting": "Запуск…", "mode_midi": "Режим: экспорт MIDI", "mode_flp": "Режим: объединенный FLP", "muted_included": "включены", "muted_skipped": "пропущены", "engine": "Движок расширения: ", "turbo_engine": "Турбо нативный/прямой", "sorted_engine": "Совместимая сортировка", "cancel_requested": "Запрошена отмена…", "cancelling": "Отмена после текущего блока…", "completed": "Успешно завершено.", "midi_completed": "Экспорт MIDI успешно завершен.", "cancelled": "Отменено.", "failed": "Ошибка.", "open_verify": "Откройте копию в FL Studio и проверьте ее.", "midi_summary": "Экспортировано нот: {count:,}.\nВыход: {output}", "flp_summary": "Объединено нот: {count:,} из клипов: {clips:,}.\nЦелевой паттерн: {pattern}\nВыход: {size}\nВремя: {time:,.1f} с",
+    },
+}
+
+TRANSLATIONS["en"].update({
+    "notes_per_file": "Notes/File:",
+    "notes_per_file_info": "Create numbered MIDI files with this many notes per file. Leave empty to disable.",
+})
+TRANSLATIONS["tr"].update({
+    "notes_per_file": "Nota/Dosya:",
+    "notes_per_file_info": "Bu kadar nota içeren numaralı MIDI dosyaları oluşturur. Kapatmak için boş bırakın.",
+})
+TRANSLATIONS["ja"].update({
+    "notes_per_file": "ノート/ファイル:",
+    "notes_per_file_info": "指定したノート数ごとに番号付きMIDIを作成します。無効にする場合は空欄にします。",
+})
+TRANSLATIONS["ru"].update({
+    "notes_per_file": "Нот/файл:",
+    "notes_per_file_info": "Создавать нумерованные MIDI-файлы с указанным числом нот. Оставьте пустым, чтобы отключить.",
+})
+
+# FL note fields used by MIDI export. FL stores the piano-roll key as a
+# 16-bit value and velocity as an 8-bit value in each 24-byte note record.
+NOTE_KEY_OFFSET = 12
+NOTE_VELOCITY_OFFSET = 21
+
 # FLP event IDs used by this tool.
 EV_PLAY_TRUNCATED = 30
 EV_NEW_PATTERN = 65
@@ -1276,16 +1327,253 @@ def merge_flp(
     return stats
 
 
+# ------------------------------ MIDI export -------------------------------
+
+
+def midi_varlen(value: int) -> bytes:
+    if value < 0:
+        raise ValueError("MIDI delta time cannot be negative.")
+    encoded = bytearray((value & 0x7F,))
+    value >>= 7
+    while value:
+        encoded.insert(0, (value & 0x7F) | 0x80)
+        value >>= 7
+    return bytes(encoded)
+
+
+def write_midi_file(
+    merged_notes_path: Path,
+    merged_note_count: int,
+    ppq: int,
+    output_path: Path,
+    cancel: threading.Event | None,
+) -> None:
+    try:
+        import numpy as np
+    except ImportError:
+        np = None
+
+    if np is not None:
+        status = None
+        note_dtype = np.dtype(
+            {
+                "names": ("position", "length", "key", "velocity"),
+                "formats": ("<u4", "<u4", "<u2", "u1"),
+                "offsets": (0, 8, NOTE_KEY_OFFSET, NOTE_VELOCITY_OFFSET),
+                "itemsize": NOTE_SIZE,
+            }
+        )
+        notes = np.fromfile(merged_notes_path, dtype=note_dtype, count=merged_note_count)
+        if len(notes) != merged_note_count:
+            raise FLPFormatError("Merged-note temporary file is truncated.")
+        events = np.empty(
+            merged_note_count * 2,
+            dtype=np.dtype(
+                [("tick", "<u8"), ("kind", "u1"), ("pitch", "u1"), ("velocity", "u1")]
+            ),
+        )
+        positions = notes["position"].astype(np.uint64, copy=False)
+        ends = positions + np.maximum(notes["length"], 1).astype(np.uint64, copy=False)
+        pitches = np.minimum(notes["key"], 127).astype(np.uint8, copy=False)
+        velocities = np.maximum(np.minimum(notes["velocity"], 127), 1)
+        events[0::2]["tick"] = positions
+        events[0::2]["kind"] = 1
+        events[0::2]["pitch"] = pitches
+        events[0::2]["velocity"] = velocities
+        events[1::2]["tick"] = ends
+        events[1::2]["kind"] = 0
+        events[1::2]["pitch"] = pitches
+        events[1::2]["velocity"] = 0
+        events.sort(order=("tick", "kind"), kind="stable")
+        event_rows = ((int(event["tick"]), int(event["kind"]), int(event["pitch"]), int(event["velocity"])) for event in events)
+    else:
+        events_fallback: list[tuple[int, int, int, int]] = []
+        with merged_notes_path.open("rb", buffering=8 * 1024 * 1024) as notes:
+            for index in range(merged_note_count):
+                if index % 100_000 == 0:
+                    check_cancel(cancel)
+                raw = read_exact(notes, NOTE_SIZE)
+                position = struct.unpack_from("<I", raw, 0)[0]
+                length = struct.unpack_from("<I", raw, 8)[0]
+                pitch = max(0, min(127, struct.unpack_from("<H", raw, NOTE_KEY_OFFSET)[0]))
+                velocity = max(1, min(127, raw[NOTE_VELOCITY_OFFSET]))
+                end = position + max(1, length)
+                events_fallback.append((position, 1, pitch, velocity))
+                events_fallback.append((end, 0, pitch, 0))
+        events_fallback.sort(key=lambda event: (event[0], event[1]))
+        event_rows = iter(events_fallback)
+
+    write_midi_events(event_rows, ppq, output_path)
+
+
+def write_midi_events(
+    event_rows: object,
+    ppq: int,
+    output_path: Path,
+) -> None:
+    track = bytearray(b"\x00\xFF\x51\x03\x07\xA1\x20")  # 120 BPM.
+    previous_tick = 0
+    for tick, kind, pitch, velocity in event_rows:
+        track.extend(midi_varlen(tick - previous_tick))
+        track.extend((0x90 if kind else 0x80, pitch, velocity))
+        previous_tick = tick
+    track.extend(b"\x00\xFF\x2F\x00")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("wb") as output:
+        output.write(b"MThd")
+        output.write(struct.pack(">IHHH", 6, 0, 1, ppq))
+        output.write(b"MTrk")
+        output.write(struct.pack(">I", len(track)))
+        output.write(track)
+
+
+def write_split_midi_files(
+    merged_notes_path: Path,
+    merged_note_count: int,
+    scan: ScanResult,
+    output_path: Path,
+    cancel: threading.Event | None,
+) -> int:
+    arrangement_events: dict[int, list[tuple[int, int, int, int]]] = {
+        arr_id: [] for arr_id in scan.arrangement_order
+    }
+    with merged_notes_path.open("rb", buffering=8 * 1024 * 1024) as notes:
+        for index in range(merged_note_count):
+            if index % 100_000 == 0:
+                check_cancel(cancel)
+            raw = read_exact(notes, NOTE_SIZE)
+            position = struct.unpack_from("<I", raw, 0)[0]
+            length = struct.unpack_from("<I", raw, 8)[0]
+            for arr_id in scan.arrangement_order:
+                arr = scan.arrangements[arr_id]
+                if arr.section_offset <= position < arr.section_offset + arr.timeline_length:
+                    relative_position = position - arr.section_offset
+                    pitch = max(0, min(127, struct.unpack_from("<H", raw, NOTE_KEY_OFFSET)[0]))
+                    velocity = max(1, min(127, raw[NOTE_VELOCITY_OFFSET]))
+                    arrangement_events[arr_id].append(
+                        (relative_position, 1, pitch, velocity)
+                    )
+                    arrangement_events[arr_id].append(
+                        (relative_position + max(1, length), 0, pitch, 0)
+                    )
+                    break
+
+    for arr_id in scan.arrangement_order:
+        check_cancel(cancel)
+        events = arrangement_events[arr_id]
+        events.sort(key=lambda event: (event[0], event[1]))
+        output = output_path.with_name(
+            f"{output_path.stem}_arrangement_{arr_id}{output_path.suffix or '.mid'}"
+        )
+        write_midi_events(events, scan.ppq, output)
+    return len(scan.arrangement_order)
+
+
+def write_midi_chunks(
+    merged_notes_path: Path,
+    merged_note_count: int,
+    ppq: int,
+    output_path: Path,
+    notes_per_file: int,
+    cancel: threading.Event | None,
+) -> int:
+    if notes_per_file <= 0:
+        raise ValueError("Notes per file must be greater than zero.")
+
+    chunks: list[list[tuple[int, int, int, int]]] = []
+    current: list[tuple[int, int, int, int]] = []
+    with merged_notes_path.open("rb", buffering=8 * 1024 * 1024) as notes:
+        for index in range(merged_note_count):
+            if index % 100_000 == 0:
+                check_cancel(cancel)
+            raw = read_exact(notes, NOTE_SIZE)
+            position = struct.unpack_from("<I", raw, 0)[0]
+            length = struct.unpack_from("<I", raw, 8)[0]
+            pitch = max(0, min(127, struct.unpack_from("<H", raw, NOTE_KEY_OFFSET)[0]))
+            velocity = max(1, min(127, raw[NOTE_VELOCITY_OFFSET]))
+            current.append((position, 1, pitch, velocity))
+            current.append((position + max(1, length), 0, pitch, 0))
+            if (index + 1) % notes_per_file == 0:
+                chunks.append(current)
+                current = []
+    if current:
+        chunks.append(current)
+
+    for index, events in enumerate(chunks, 1):
+        check_cancel(cancel)
+        events.sort(key=lambda event: (event[0], event[1]))
+        output = output_path.with_name(
+            f"{output_path.stem}_part_{index:03d}{output_path.suffix or '.mid'}"
+        )
+        write_midi_events(events, ppq, output)
+    return len(chunks)
+
+
+def export_midi(
+    source_path: Path,
+    output_path: Path,
+    options: MergeOptions | None = None,
+    status: StatusCallback | None = None,
+    cancel: threading.Event | None = None,
+    split_by_arrangement: bool = False,
+    notes_per_file: int | None = None,
+) -> int:
+    options = options or MergeOptions()
+    status = status or (lambda _message: None)
+    source_path = source_path.expanduser().resolve()
+    output_path = output_path.expanduser().resolve()
+    if source_path == output_path:
+        raise ValueError("Choose a different output path; the source is never overwritten.")
+    if source_path.suffix.lower() != ".flp":
+        raise ValueError("The input must be an .flp file.")
+    if not source_path.is_file():
+        raise FileNotFoundError(f"Input project not found: {source_path}")
+
+    scan = scan_flp(source_path, status, cancel)
+    with tempfile.TemporaryDirectory(prefix="flp_midi_export_") as temp_name:
+        temp_dir = Path(temp_name)
+        clip_path = temp_dir / "pattern_clips.bin"
+        extract_pattern_clips(scan, clip_path, options, status, cancel)
+        merged_path, merged_count = build_merged_notes(
+            scan, clip_path, temp_dir, options, status, cancel
+        )
+        if merged_count == 0:
+            raise FLPFormatError("Pattern Clips were found, but no notes fall inside their visible ranges.")
+        status(
+            "Writing split MIDI files…"
+            if split_by_arrangement or notes_per_file is not None
+            else "Writing MIDI file…"
+        )
+        if notes_per_file is not None:
+            files = write_midi_chunks(
+                merged_path, merged_count, scan.ppq, output_path,
+                notes_per_file, cancel,
+            )
+            status(f"Done: {merged_count:,} notes exported to {files} MIDI files.")
+        elif split_by_arrangement:
+            files = write_split_midi_files(
+                merged_path, merged_count, scan, output_path, cancel
+            )
+            status(f"Done: {merged_count:,} notes exported to {files} MIDI files.")
+        else:
+            write_midi_file(merged_path, merged_count, scan.ppq, output_path, cancel)
+            status(f"Done: {merged_count:,} notes exported to {output_path.name}.")
+    return merged_count
+
+
 # ---------------------------------- GUI -----------------------------------
 
 
-def default_output_for(input_text: str) -> str:
+def default_output_for(input_text: str, midi: bool = False) -> str:
     if not input_text:
         return ""
     path = Path(input_text)
     if path.suffix.lower() == ".flp":
+        if midi:
+            return str(path.with_name(path.stem + ".mid"))
         return str(path.with_name(path.stem + "_merged_notes.flp"))
-    return str(path) + "_merged_notes.flp"
+    return str(path) + (".mid" if midi else "_merged_notes.flp")
 
 
 def format_size(size: int) -> str:
@@ -1325,11 +1613,17 @@ def launch_gui() -> None:
             self.output_var = tk.StringVar()
             self.include_muted_var = tk.BooleanVar(value=True)
             self.turbo_var = tk.BooleanVar(value=True)
+            self.export_midi_var = tk.BooleanVar(value=False)
             self.status_var = tk.StringVar(value="Ready")
+            self.language_var = tk.StringVar(value="English")
 
             self._configure_style(ttk)
             self._build(tk, ttk, filedialog)
             self.root.after(100, self._poll)
+
+        def t(self, key: str, **values: object) -> str:
+            language = LANGUAGES[self.language_var.get()]
+            return TRANSLATIONS[language][key].format(**values)
 
         def _configure_style(self, ttk_module: object) -> None:
             style = ttk.Style()
@@ -1345,89 +1639,97 @@ def launch_gui() -> None:
             style.configure("Primary.TButton", font=("Segoe UI", 10, "bold"), padding=(14, 8))
 
         def _build(self, tk: object, ttk: object, filedialog: object) -> None:
+            self._tk_module = tk
+            self._ttk_module = ttk
+            self._filedialog_module = filedialog
+            if hasattr(self, "outer"):
+                self.outer.destroy()
             outer = ttk.Frame(self.root, padding=18)
+            self.outer = outer
             outer.pack(fill="both", expand=True)
 
-            ttk.Label(outer, text="FLP Note Merger", style="Title.TLabel").pack(anchor="w")
+            language_row = ttk.Frame(outer)
+            language_row.pack(fill="x", pady=(0, 8))
+            ttk.Label(language_row, text=self.t("language")).pack(side="right", padx=(0, 6))
+            language_box = ttk.Combobox(
+                language_row, textvariable=self.language_var, values=list(LANGUAGES), state="readonly", width=12
+            )
+            language_box.pack(side="right")
+            language_box.bind("<<ComboboxSelected>>", self._change_language)
+
+            ttk.Label(outer, text=APP_NAME, style="Title.TLabel").pack(anchor="w")
             ttk.Label(
                 outer,
-                text=(
-                    "Flatten every Playlist Pattern Clip into one lossless FL pattern. "
-                    "Audio and automation clips are excluded."
-                ),
+                text=self.t("subtitle"),
                 style="Sub.TLabel",
                 wraplength=730,
             ).pack(anchor="w", pady=(2, 16))
 
-            files = ttk.LabelFrame(outer, text="Project files", padding=12)
+            files = ttk.LabelFrame(outer, text=self.t("files"), padding=12)
             files.pack(fill="x")
             files.columnconfigure(1, weight=1)
 
-            ttk.Label(files, text="Input .flp:").grid(row=0, column=0, sticky="w", padx=(0, 8), pady=5)
+            ttk.Label(files, text=self.t("input")).grid(row=0, column=0, sticky="w", padx=(0, 8), pady=5)
             input_entry = ttk.Entry(files, textvariable=self.input_var)
             input_entry.grid(row=0, column=1, sticky="ew", pady=5)
-            ttk.Button(files, text="Browse…", command=self._browse_input).grid(
+            ttk.Button(files, text=self.t("browse"), command=self._browse_input).grid(
                 row=0, column=2, padx=(8, 0), pady=5
             )
 
-            ttk.Label(files, text="Output copy:").grid(row=1, column=0, sticky="w", padx=(0, 8), pady=5)
+            ttk.Label(files, text=self.t("output")).grid(row=1, column=0, sticky="w", padx=(0, 8), pady=5)
             output_entry = ttk.Entry(files, textvariable=self.output_var)
             output_entry.grid(row=1, column=1, sticky="ew", pady=5)
-            ttk.Button(files, text="Browse…", command=self._browse_output).grid(
+            ttk.Button(files, text=self.t("browse"), command=self._browse_output).grid(
                 row=1, column=2, padx=(8, 0), pady=5
             )
             output_entry.bind("<Key>", lambda _event: setattr(self, "output_was_auto", False))
 
-            options_frame = ttk.LabelFrame(outer, text="Merge behavior", padding=12)
+            options_frame = ttk.LabelFrame(outer, text=self.t("behavior"), padding=12)
             options_frame.pack(fill="x", pady=(12, 0))
             ttk.Checkbutton(
                 options_frame,
-                text="Turbo expansion (native vector batches; recommended)",
+                text=self.t("turbo"),
                 variable=self.turbo_var,
             ).pack(anchor="w")
             ttk.Label(
                 options_frame,
-                text=(
-                    "Uses NumPy's compiled native loops and bypasses the unnecessary global note sort. "
-                    "Turn this off only for strict sorted-record compatibility."
-                ),
+                text=self.t("turbo_info"),
                 wraplength=730,
             ).pack(anchor="w", padx=(22, 0), pady=(2, 7))
             ttk.Checkbutton(
                 options_frame,
-                text="Include muted Pattern Clips (keeps every note)",
+                text=self.t("muted"),
                 variable=self.include_muted_var,
             ).pack(anchor="w")
             ttk.Label(
                 options_frame,
-                text=(
-                    "Muted clip state cannot exist after everything is merged into one clip. "
-                    "Included muted notes will therefore become unmuted. Turn this off to preserve the audible song instead."
-                ),
+                text=self.t("muted_info"),
                 wraplength=710,
             ).pack(anchor="w", padx=(22, 0), pady=(2, 7))
             ttk.Label(
                 options_frame,
-                text=(
-                    "All Arrangements are preserved as separate offset sections of one target pattern. "
-                    "Old note payloads and Pattern event automation are cleared to reduce loading and file size."
-                ),
+                text=self.t("arrangements"),
                 wraplength=710,
             ).pack(anchor="w")
-
+            ttk.Checkbutton(
+                options_frame,
+                text=self.t("midi_mode"),
+                variable=self.export_midi_var,
+                command=self._update_output_mode,
+            ).pack(anchor="w", pady=(10, 0))
             action = ttk.Frame(outer)
             action.pack(fill="x", pady=(14, 8))
             self.start_button = ttk.Button(
-                action, text="Merge notes", style="Primary.TButton", command=self._start
+                action, text=self.t("merge"), style="Primary.TButton", command=self._start
             )
             self.start_button.pack(side="left")
-            self.cancel_button = ttk.Button(action, text="Cancel", command=self._cancel, state="disabled")
+            self.cancel_button = ttk.Button(action, text=self.t("cancel"), command=self._cancel, state="disabled")
             self.cancel_button.pack(side="left", padx=(8, 0))
             self.progress = ttk.Progressbar(action, mode="indeterminate")
             self.progress.pack(side="left", fill="x", expand=True, padx=(16, 0))
 
             ttk.Label(outer, textvariable=self.status_var).pack(anchor="w", pady=(0, 6))
-            log_frame = ttk.LabelFrame(outer, text="Activity", padding=6)
+            log_frame = ttk.LabelFrame(outer, text=self.t("activity"), padding=6)
             log_frame.pack(fill="both", expand=True)
             self.log = tk.Text(
                 log_frame,
@@ -1444,30 +1746,43 @@ def launch_gui() -> None:
 
             ttk.Label(
                 outer,
-                text="Unofficial FLP editing tool — the original file is never changed. Verify the output in FL Studio.",
+                text=self.t("warning"),
                 foreground="#8a4b08",
                 wraplength=730,
             ).pack(anchor="w", pady=(10, 0))
 
         def _browse_input(self) -> None:
             path = filedialog.askopenfilename(
-                title="Choose FL Studio project",
-                filetypes=[("FL Studio project", "*.flp"), ("All files", "*.*")],
+                title=self.t("choose_project"),
+                filetypes=[(self.t("flp_file"), "*.flp"), (self.t("all_files"), "*.*")],
             )
             if path:
                 self.input_var.set(path)
                 if self.output_was_auto or not self.output_var.get().strip():
-                    self.output_var.set(default_output_for(path))
+                    self.output_var.set(default_output_for(path, self.export_midi_var.get()))
                     self.output_was_auto = True
 
+        def _update_output_mode(self) -> None:
+            if self.output_was_auto:
+                self.output_var.set(default_output_for(self.input_var.get().strip(), self.export_midi_var.get()))
+            self.start_button.configure(
+                text=self.t("export") if self.export_midi_var.get() else self.t("merge")
+            )
+
+        def _change_language(self, _event: object = None) -> None:
+            self._build(self._tk_module, self._ttk_module, self._filedialog_module)
+
         def _browse_output(self) -> None:
-            initial = self.output_var.get().strip() or default_output_for(self.input_var.get().strip())
+            midi = self.export_midi_var.get()
+            initial = self.output_var.get().strip() or default_output_for(self.input_var.get().strip(), midi)
             path = filedialog.asksaveasfilename(
-                title="Save merged FLP copy",
-                defaultextension=".flp",
-                initialfile=Path(initial).name if initial else "merged_notes.flp",
+                title=self.t("save_midi") if midi else self.t("save_flp"),
+                defaultextension=".mid" if midi else ".flp",
+                initialfile=Path(initial).name if initial else ("export.mid" if midi else "merged_notes.flp"),
                 initialdir=str(Path(initial).parent) if initial else None,
-                filetypes=[("FL Studio project", "*.flp"), ("All files", "*.*")],
+                filetypes=[(self.t("midi_file"), "*.mid"), (self.t("all_files"), "*.*")] if midi else [
+                    (self.t("flp_file"), "*.flp"), (self.t("all_files"), "*.*")
+                ],
             )
             if path:
                 self.output_var.set(path)
@@ -1492,18 +1807,19 @@ def launch_gui() -> None:
                 return
             source_text = self.input_var.get().strip()
             output_text = self.output_var.get().strip()
+            exporting_midi = self.export_midi_var.get()
             try:
                 if not source_text:
-                    raise ValueError("Choose an input FLP.")
+                    raise ValueError(self.t("choose_input"))
                 if not output_text:
-                    raise ValueError("Choose an output path.")
+                    raise ValueError(self.t("choose_output"))
                 source = Path(source_text)
                 output = Path(output_text)
                 if source.expanduser().resolve() == output.expanduser().resolve():
-                    raise ValueError("Input and output must be different files.")
+                    raise ValueError(self.t("different"))
                 if output.exists():
                     if not messagebox.askyesno(
-                        APP_NAME, f"The output already exists:\n\n{output}\n\nReplace it?"
+                        APP_NAME, self.t("replace", path=output)
                     ):
                         return
             except Exception as exc:
@@ -1512,16 +1828,17 @@ def launch_gui() -> None:
 
             self.cancel_event.clear()
             self._set_running(True)
-            self.status_var.set("Starting…")
+            self.status_var.set(self.t("starting"))
             self._append_log("—" * 72)
             self._append_log(f"Input:  {source}")
             self._append_log(f"Output: {output}")
+            self._append_log(self.t("mode_midi") if exporting_midi else self.t("mode_flp"))
             self._append_log(
-                "Muted clips: " + ("included" if self.include_muted_var.get() else "skipped")
+                "Muted clips: " + (self.t("muted_included") if self.include_muted_var.get() else self.t("muted_skipped"))
             )
             self._append_log(
-                "Expansion engine: "
-                + ("Turbo native/direct" if self.turbo_var.get() else "Compatibility sorted")
+                self.t("engine")
+                + (self.t("turbo_engine") if self.turbo_var.get() else self.t("sorted_engine"))
             )
 
             options = MergeOptions(
@@ -1531,14 +1848,22 @@ def launch_gui() -> None:
 
             def work() -> None:
                 try:
-                    stats = merge_flp(
-                        source,
-                        output,
-                        options=options,
-                        status=lambda msg: self.messages.put(("status", msg)),
-                        cancel=self.cancel_event,
-                    )
-                    self.messages.put(("done", stats))
+                    if exporting_midi:
+                        count = export_midi(
+                            source, output, options=options,
+                            status=lambda msg: self.messages.put(("status", msg)),
+                            cancel=self.cancel_event,
+                        )
+                        self.messages.put(("midi_done", count))
+                    else:
+                        stats = merge_flp(
+                            source,
+                            output,
+                            options=options,
+                            status=lambda msg: self.messages.put(("status", msg)),
+                            cancel=self.cancel_event,
+                        )
+                        self.messages.put(("done", stats))
                 except MergeCancelled as exc:
                     self.messages.put(("cancelled", str(exc)))
                 except Exception as exc:
@@ -1551,8 +1876,8 @@ def launch_gui() -> None:
         def _cancel(self) -> None:
             self.cancel_event.set()
             self.cancel_button.configure(state="disabled")
-            self.status_var.set("Cancelling after the current block…")
-            self._append_log("Cancellation requested…")
+            self.status_var.set(self.t("cancelling"))
+            self._append_log(self.t("cancel_requested"))
 
         def _poll(self) -> None:
             try:
@@ -1566,24 +1891,28 @@ def launch_gui() -> None:
                         stats = payload
                         assert isinstance(stats, MergeStats)
                         self._set_running(False)
-                        summary = (
-                            f"Merged {stats.merged_notes:,} notes from "
-                            f"{stats.included_pattern_clips:,} Pattern Clips.\n"
-                            f"Target pattern: {stats.target_pattern_id}\n"
-                            f"Output: {format_size(stats.output_size)}\n"
-                            f"Time: {stats.elapsed_seconds:,.1f} seconds"
+                        summary = self.t(
+                            "flp_summary", count=stats.merged_notes,
+                            clips=stats.included_pattern_clips, pattern=stats.target_pattern_id,
+                            size=format_size(stats.output_size), time=stats.elapsed_seconds,
                         )
-                        self.status_var.set("Completed successfully.")
+                        self.status_var.set(self.t("completed"))
                         self._append_log(summary.replace("\n", " | "))
-                        messagebox.showinfo(APP_NAME, summary + "\n\nOpen and verify the copy in FL Studio.")
+                        messagebox.showinfo(APP_NAME, summary + "\n\n" + self.t("open_verify"))
+                    elif kind == "midi_done":
+                        self._set_running(False)
+                        summary = self.t("midi_summary", count=int(payload), output=self.output_var.get())
+                        self.status_var.set(self.t("midi_completed"))
+                        self._append_log(summary.replace("\n", " | "))
+                        messagebox.showinfo(APP_NAME, summary)
                     elif kind == "cancelled":
                         self._set_running(False)
-                        self.status_var.set("Cancelled.")
+                        self.status_var.set(self.t("cancelled"))
                         self._append_log(str(payload))
                     elif kind == "error":
                         self._set_running(False)
                         message, detail = payload
-                        self.status_var.set("Failed.")
+                        self.status_var.set(self.t("failed"))
                         self._append_log(detail)
                         messagebox.showerror(APP_NAME, str(message))
             except queue.Empty:
@@ -1623,6 +1952,21 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=150_000,
         help="Notes held per external-sort run when --sorted is used (default: 150000).",
     )
+    parser.add_argument(
+        "--midi",
+        action="store_true",
+        help="Export the arranged notes as a Standard MIDI file instead of an FLP copy.",
+    )
+    parser.add_argument(
+        "--split-midi",
+        action="store_true",
+        help="When exporting MIDI, create one file per FL Arrangement.",
+    )
+    parser.add_argument(
+        "--notes-per-file",
+        type=int,
+        help="Split MIDI into numbered files with this many notes per file.",
+    )
     parser.add_argument("--version", action="version", version=f"%(prog)s {APP_VERSION}")
     return parser
 
@@ -1637,14 +1981,26 @@ def main(argv: Optional[list[str]] = None) -> int:
         parser.error("both input and output are required in command-line mode")
 
     try:
+        options = MergeOptions(
+            include_muted_clips=not args.skip_muted,
+            turbo_mode=not args.sorted,
+            sort_run_records=args.run_records,
+        )
+        if args.midi:
+            count = export_midi(
+                args.input,
+                args.output,
+                options=options,
+                status=lambda message: print(message, flush=True),
+                split_by_arrangement=args.split_midi,
+                notes_per_file=args.notes_per_file,
+            )
+            print(f"Success: {count:,} notes exported to {args.output}")
+            return 0
         stats = merge_flp(
             args.input,
             args.output,
-            options=MergeOptions(
-                include_muted_clips=not args.skip_muted,
-                turbo_mode=not args.sorted,
-                sort_run_records=args.run_records,
-            ),
+            options=options,
             status=lambda message: print(message, flush=True),
         )
     except KeyboardInterrupt:

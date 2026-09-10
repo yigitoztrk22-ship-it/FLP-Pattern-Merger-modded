@@ -140,6 +140,22 @@ py -3 flp_note_merger.py input.flp output.flp --run-records 250000
 
 Larger values can be faster but use more RAM.
 
+Export one MIDI file per FL Studio Arrangement:
+
+```bat
+py -3 flp_note_merger.py input.flp song.mid --midi --split-midi
+```
+
+This creates files such as `song_arrangement_0.mid` and `song_arrangement_1.mid`. Each file starts at MIDI tick 0. The GUI provides the same **Split MIDI by Arrangement** option.
+
+Split MIDI into numbered files with a maximum number of notes per file:
+
+```bat
+py -3 flp_note_merger.py input.flp song.mid --midi --notes-per-file 1000
+```
+
+This creates `song_part_001.mid`, `song_part_002.mid`, and so on.
+
 ## Very large projects
 
 - Use a 64-bit Python build or the provided 64-bit EXE.
