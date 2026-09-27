@@ -3,40 +3,23 @@ setlocal
 cd /d "%~dp0"
 
 echo ============================================================
-echo  Building FLP Note Merger FAST Windows app folder
+echo  Building FLP Note Merger C# + Rust Windows app
 echo ============================================================
 
-where py >nul 2>nul
-if %errorlevel%==0 (
-    set "PY=py -3"
-) else (
-    where python >nul 2>nul
-    if errorlevel 1 (
-        echo ERROR: Python was not found.
-        echo Install 64-bit Python 3.10 or newer from https://www.python.org/
-        pause
-        exit /b 1
-    )
-    set "PY=python"
-)
-
-%PY% -m pip install --user --upgrade pyinstaller "numpy>=1.24"
+call "%~dp0build_rust_windows.bat"
 if errorlevel 1 goto :failed
 
-if exist "%~dp0release\FLP_Note_Merger" rmdir /s /q "%~dp0release\FLP_Note_Merger"
+where dotnet >nul 2>nul
+if errorlevel 1 (
+    echo ERROR: .NET SDK was not found.
+    echo Install the .NET 8 SDK or newer from https://dotnet.microsoft.com/download
+    goto :failed
+)
 
-rem ONEDIR intentionally starts much faster than ONEFILE because the large
-rem NumPy native runtime does not need to unpack into %%TEMP%% on every launch.
-%PY% -m PyInstaller ^
-  --noconfirm ^
-  --clean ^
-  --onedir ^
-  --noupx ^
-  --windowed ^
-  --name FLP_Note_Merger ^
-  --distpath "%~dp0release" ^
-  --workpath "%TEMP%\FLP_Note_Merger_build" ^
-  "%~dp0flp_note_merger.py"
+if exist "%~dp0release\FLP_Note_Merger" rmdir /s /q "%~dp0release\FLP_Note_Merger"
+dotnet publish "%~dp0dotnet\FLPNoteMerger.Gui.csproj" -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o "%~dp0release\FLP_Note_Merger"
+if errorlevel 1 goto :failed
+copy /Y "%~dp0release\flp-note-merger.exe" "%~dp0release\FLP_Note_Merger\flp-note-merger.exe" >nul
 if errorlevel 1 goto :failed
 
 echo.

@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['H:\\Pixel\\downloads\\FLP_Note_Merger_Windows_v1.2_Turbo\\FLP_Note_Merger\\flp_note_merger.py'],
+    ['C:/Users/bahad/Desktop/FLP-Pattern-Merger-modded-main/flp_note_merger.py'],
     pathex=[],
     binaries=[],
     datas=[],
